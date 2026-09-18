@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: criteria-builder-poc
+
+  # ---------- DataSource (H2) ----------
+  datasource:
+    url: jdbc:h2:file:./data/criteria_builder_db;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      pool-name: CriteriaBuilderHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # ---------- H2 Console ----------
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+
+  # ---------- JPA / Hibernate ----------
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  # ---------- SQL init (optional) ----------
+  sql:
+    init:
+      mode: never
+
+  # ---------- Jackson ----------
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+  # ---------- Web ----------
+  web:
+    resources:
+      add-mappings: false
+    error:
+      include-message: always
+      include-binding-errors: always
+      include-stacktrace: on_param
+
+# ---------- Server ----------
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+    min-response-size: 1024
+
+# ---------- Logging ----------
+logging:
+  level:
+    root: INFO
+    com.sagar.criteria_builder_poc: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ---------- Actuator ----------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# ---------- App-specific custom props ----------
+app:
+  criteria:
+    max-page-size: 100
+    default-page-size: 20
+    default-sort-field: id
+    default-sort-direction: ASC
