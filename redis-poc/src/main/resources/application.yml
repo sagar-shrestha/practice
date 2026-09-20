@@ -1,0 +1,141 @@
+spring:
+  application:
+    name: criteria-builder-redis-poc
+
+  datasource:
+    url: jdbc:h2:file:./data/criteria_builder_db;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      pool-name: CriteriaBuilderHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+
+  jpa:
+    # database-platform: org.hibernate.dialect.H2Dialect   # H2 warns it's unnecessary
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  sql:
+    init:
+      mode: never
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+  web:
+    resources:
+      add-mappings: false
+    error:
+      include-message: always
+      include-binding-errors: always
+      include-stacktrace: on_param
+
+  # ---------- Redis (correct location) ----------
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      username: default
+      password: ""
+      database: 0
+      timeout: 3000ms
+      connect-timeout: 3000ms
+      client-type: lettuce
+      lettuce:
+        pool:
+          enabled: false
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+          max-wait: 2000ms
+          time-between-eviction-runs: 30s
+        shutdown-timeout: 200ms
+      repositories:
+        enabled: false
+
+  # ---------- Cache (only if starter-cache is added) ----------
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+      cache-null-values: false
+      key-prefix: "cbpoc::"
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+    min-response-size: 1024
+
+logging:
+  level:
+    root: INFO
+    com.sagar.criteria_builder_poc: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# ---------- App-specific ----------
+app:
+  criteria:
+    max-page-size: 100
+    default-page-size: 20
+    default-sort-field: id
+    default-sort-direction: ASC
+  redis:
+    cache:
+      ttl-seconds: 600
+      key-prefix: "cbpoc:"
+      null-value-ttl-seconds: 60
+    pubsub:
+      channel: criteria-builder-events
+    lock:
+      key-prefix: "cbpoc:lock:"
+      timeout-ms: 5000
+
+springdoc:
+  api-docs:
+    # Change the default OpenAPI JSON endpoint path (Default: /v3/api-docs)
+    path: /api-docs
+  swagger-ui:
+    # Change the interactive UI endpoint path (Default: /swagger-ui/index.html)
+    path: /custom-swagger-ui.html
+    # Control how endpoints are sorted (alpha, method, or registry)
+    operations-sorter: method
+    # Automatically enables the "Try it out" button by default
+    try-it-out-enabled: true

@@ -5,6 +5,8 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/criteria-builder-poc/pom.xml" />
+        <option value="$PROJECT_DIR$/redis-poc/pom.xml" />
+        <option value="$PROJECT_DIR$/aop-poc/pom.xml" />
       </list>
     </option>
   </component>
